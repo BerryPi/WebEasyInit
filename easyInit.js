@@ -1,17 +1,20 @@
 // The array of party members. Each has a name and initiative bonus.
 var party = []
-// The array of enemies
+// The array of enemies. Each has a name and initiative bonus, as well as a quantity of the enemy to include in the encounter.
 var enemies = []
+// The array of characters in the current encounter, along with their total initiative.
+var fighters = [];
 
 // Grabbing the HTML entities so it does not have to be done each time
 var partyTable = document.getElementById("party");
 var enemyTable = document.getElementById("enemies")
+var initiativeTable = document.getElementById("initiative");
 
 // Adds a member and their initiative bonus to the list of party members
 function addPartyMember() {
 	// Save the member's name and initiative bonus
 	var name = document.getElementById("partyNameBox").value;
-	var initBonus = document.getElementById("partyInitBox").value;
+	var initBonus = parseInt(document.getElementById("partyInitBox").value);
 	var member = {name: name, initBonus: initBonus};
 	party.push(member);
 	// Adding the data to the table just before the text fields
@@ -28,13 +31,13 @@ function addPartyMember() {
 }
 
 function addEnemies() {
-	// Save the input
+	// Save the input.
 	var name = document.getElementById("enemyNameBox").value;
-	var initBonus = document.getElementById("enemyInitBox").value;
-	var enemyQty = document.getElementById("enemyQtyBox").value;
+	var initBonus = parseInt(document.getElementById("enemyInitBox").value);
+	var enemyQty = parseInt(document.getElementById("enemyQtyBox").value);
 	var enemyType = {name: name, initBonus: initBonus, qty: enemyQty};
 	enemies.push(enemyType);
-	// Displaying the new data in the table
+	// Displaying the new data in the table.
 	var newRow = enemyTable.insertRow(enemies.length);
 	newRow.insertCell().innerText = name;
 	newRow.insertCell().innerText = initBonus;
@@ -44,7 +47,7 @@ function addEnemies() {
 	var removeButtonCell = newRow.insertCell();
 	removeButtonCell.innerHTML = "<input type=\"button\" value=\"X\">";
 	removeButtonCell.getElementsByTagName("input")[0].onclick = function() {removeFromTable(enemyTable, enemies, enemyType);};
-	// Go back to the first text box for easier adding
+	// Go back to the first text box for easier addin
 	document.getElementById("enemyNameBox").focus();
 }
 
@@ -55,4 +58,52 @@ function removeFromTable(table, array, item) {
 	array.splice(index, 1);
 	// The header occupies a row in the table.
 	table.deleteRow(index + 1);
+}
+
+// Returns a random integer between 1 and 20, inclusive.
+function rollD20(){
+	return Math.floor(Math.random() * 20) + 1;
+}
+
+// Generate the list of fighters and roll for initiative.
+function rollInitiative(){
+	fighters = [];
+	// Roll for party members and add them to the array.
+	for (var i = 0; i < party.length; i++) {
+		var currMember = party[i];
+		var currInitiative = rollD20() + currMember.initBonus;
+		fighters.push({name: currMember.name, initiative: currInitiative});
+	}
+	// Roll for enemies and add them to the array.
+	for (var i = 0; i < enemies.length; i++) {
+		var enemyType = enemies[i];
+		// j is used only for the names, which should not be 0-indexed.
+		for (var j = 1; j <= enemyType.qty; j++) {
+			var currEnemyName = enemyType.name + " #" + j;
+			var currInitiative = rollD20() + enemyType.initBonus;
+			fighters.push({name: currEnemyName, initiative: currInitiative})
+		}
+	}
+	// Sort the array in order of decreasing initiative.
+	fighters.sort(function(char1, char2) {return -(char1.initiative - char2.initiative);});
+}
+
+// Resets the initiative order table to allow generating a new order.
+function resetInitiativeTable() {
+	// Delete all rows except the header
+	for (var i = initiativeTable.rows.length - 1; i > 0; i--) {
+		initiativeTable.deleteRow(i);
+	}
+}
+
+// Generates and displays the initiative order on the webpage.
+function displayInitiativeOrder() {
+	resetInitiativeTable();
+	rollInitiative();
+	for (var i = 0; i < fighters.length; i++) {
+		var currFighter = fighters[i];
+		var newInitTableRow = initiativeTable.insertRow();
+		newInitTableRow.insertCell().innerText = currFighter.name;
+		newInitTableRow.insertCell().innerText = currFighter.initiative;
+	}
 }
