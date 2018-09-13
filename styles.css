@@ -1,11 +1,11 @@
-table#party {
+table {
 	border: 1px solid black;
 }
 
-table#party tr:nth-child(even) {
+table tr:nth-child(even) {
 	background-color: white;
 }
 
-table#party tr:nth-child(odd) {
+table tr:nth-child(odd) {
 	background-color: grey;
 }
