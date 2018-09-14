@@ -9,3 +9,7 @@ table tr:nth-child(even) {
 table tr:nth-child(odd) {
 	background-color: grey;
 }
+
+tr#currentTurn {
+	background-color: orange;
+}

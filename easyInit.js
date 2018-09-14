@@ -4,6 +4,8 @@ var party = []
 var enemies = []
 // The array of characters in the current encounter, along with their total initiative.
 var fighters = [];
+// The index of the character currently taking their turn, to be highlighted on the table.
+var currTurn = - 1;
 
 // Grabbing the HTML entities so it does not have to be done each time
 var partyTable = document.getElementById("party");
@@ -86,6 +88,8 @@ function rollInitiative(){
 	}
 	// Sort the array in order of decreasing initiative.
 	fighters.sort(function(char1, char2) {return -(char1.initiative - char2.initiative);});
+	// Initialise the turn counter. When the turn button is next pressed, this will be reset to the first member.
+	currTurn = fighters.length - 1;
 }
 
 // Resets the initiative order table to allow generating a new order.
@@ -106,4 +110,16 @@ function displayInitiativeOrder() {
 		newInitTableRow.insertCell().innerText = currFighter.name;
 		newInitTableRow.insertCell().innerText = currFighter.initiative;
 	}
+	if (fighters.length > 0) {
+		document.getElementById("nextButton").disabled = false;
+	}
+}
+
+// Highlights the next row in the table cyclically.
+function nextTurn() {
+	// Highlighting is based on which row has the currentTurn id. Remove it from the current row and apply it to the new one.
+	// Offset of 1 to account for table header.
+	initiativeTable.rows[currTurn + 1].id = "";
+	currTurn = (currTurn + 1) % fighters.length;
+	initiativeTable.rows[currTurn + 1].id = "currentTurn";
 }
