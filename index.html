@@ -35,7 +35,11 @@
 		<tr>
 			<td><input type="text" name="Name" id="enemyNameBox"></td>
 			<td><input type="number" name="InitBonus" id="enemyInitBox"></td>
-			<td><input type="number" name="Qty" id="enemyQtyBox"></td>
+			<!--   Chrome doesn't provide maxlength restriction on number inputs, use oninput to limit length -->
+			<!--   From https://stackoverflow.com/questions/18510845/maxlength-ignored-for-input-type-number-in-chrome      -->
+			<td><input type="number" name="Qty" id="enemyQtyBox" 
+					   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+					   maxlength="4"></td>
 		</tr>
 	</table>
 	<input type="button" value="Add Enemies" onclick="addEnemies();">
